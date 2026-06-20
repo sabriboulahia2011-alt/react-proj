@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Folder } from "lucide-react";
+import { Folder, FolderPlus } from "lucide-react";
 import { Button } from "./ui/button";
 import { FolderTree } from "./FolderTree";
+import { NewFolderDialog } from "./NewFolderDialog";
+import { useFolderTree } from "@/lib/useFolderTree";
 import {
   Dialog, DialogOverlay, DialogContent,
   DialogHeader, DialogTitle, DialogClose, DialogFooter,
@@ -9,6 +11,8 @@ import {
 
 export function FolderDialog({ open, onClose, onConfirm, currentFolder }) {
   const [selected, setSelected] = useState(currentFolder);
+  const [newFolderOpen, setNewFolderOpen] = useState(false);
+  const { createFolder } = useFolderTree();
 
   const handleConfirm = () => {
     if (selected) onConfirm(selected);
@@ -27,7 +31,20 @@ export function FolderDialog({ open, onClose, onConfirm, currentFolder }) {
 
         <DialogHeader>
           <DialogTitle>Select folder</DialogTitle>
-          <DialogClose onClick={onClose} />
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => setNewFolderOpen(true)}
+              disabled={!selected}
+              title="New folder inside selected"
+            >
+              <FolderPlus size={13} />
+              New folder
+            </Button>
+            <DialogClose onClick={onClose} />
+          </div>
         </DialogHeader>
 
         {/* Breadcrumb */}
@@ -68,6 +85,13 @@ export function FolderDialog({ open, onClose, onConfirm, currentFolder }) {
             <Button size="sm" onClick={handleConfirm} disabled={!selected}>Select</Button>
           </div>
         </DialogFooter>
+
+        <NewFolderDialog
+          open={newFolderOpen}
+          onClose={() => setNewFolderOpen(false)}
+          parentDisplay={selected || ""}
+          onConfirm={(name) => selected && createFolder(selected, name)}
+        />
 
       </DialogContent>
     </Dialog>
