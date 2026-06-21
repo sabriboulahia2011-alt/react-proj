@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const webpack = require("webpack");
 
 module.exports = (env, argv) => {
   const isDev = argv.mode === "development";
@@ -27,7 +28,7 @@ module.exports = (env, argv) => {
             options: {
               presets: [
                 ["@babel/preset-env", { targets: "defaults" }],
-                ["@babel/preset-react", { runtime: "automatic" }],
+                ["@babel/preset-react", { runtime: "automatic", development: isDev }],
               ],
             },
           },
@@ -43,6 +44,9 @@ module.exports = (env, argv) => {
       ],
     },
     plugins: [
+      new webpack.DefinePlugin({
+        "process.env.NODE_ENV": JSON.stringify(isDev ? "development" : "production"),
+      }),
       new HtmlWebpackPlugin({
         template: "./public/index.html",
         favicon: "./public/favicon.svg",
